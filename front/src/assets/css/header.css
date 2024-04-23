@@ -1,0 +1,3 @@
+::v-deep .v-data-table-header {
+    background-color:var(--navbar-header-color);
+}

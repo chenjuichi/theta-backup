@@ -1,0 +1,12 @@
+[
+  {
+    "baseDir": "D:\\釸達輔導案\\開發文件\\跑合機匯出EXCEL",
+
+    "customer_row": 4,
+    "spindle_cat_row": 7,
+    "id_row": 7, "id_column": 4,
+    "emp_id_row": 10,
+    "date_row": 10, "date_column": 4,
+    "runin_row": 14
+  }
+]
