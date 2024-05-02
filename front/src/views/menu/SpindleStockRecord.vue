@@ -1129,9 +1129,9 @@ div.v-toolbar__title {
 }
 /* */
 /* for data table的header, 最後一個row的color start*/
-::v-deep .sum_class span {
-  color: #1f4788 !important;
-}
+//::v-deep .sum_class span {
+//  color: #1f4788 !important;
+//}
 /* */
 
 /*
@@ -1377,4 +1377,23 @@ small.msgErr {
     background-color: #ccffe6; /* 設定四方形的邊常及顏色 */
     //position: relative; /* 讓內容絕對定位相對於此元素 */
   }
+
+  ::v-deep .v-data-table-header th:nth-last-child(2) span {
+    color: #1f4788 !important;
+  }
+
+  ::v-deep .v-data-table-header th:nth-last-child(3) span {
+    color: #1f4788 !important;
+  }
+
+  ::v-deep .v-data-table-header th:nth-last-child(6) span {
+    color: #1f4788 !important;
+  }
+  ::v-deep .v-data-table-header th:nth-last-child(8) span {
+    color: #1f4788 !important;
+  }
+  ::v-deep .v-data-table-header th:nth-last-child(9) span {
+    color: #1f4788 !important;
+  }
+
 </style>

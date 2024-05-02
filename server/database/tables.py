@@ -139,7 +139,7 @@ class Grid(BASE):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     station = Column(Integer, nullable=False)     #1~4
-    layout = Column(Integer, nullable=False)
+    layout = Column(Integer)
     total_size = Column(Integer, default=0)      #目前該儲位存放總數
     max_size = Column(Integer, default=5)        #目前存放總數
     _spindles = relationship("Spindle", secondary=association_table, back_populates="_grids")
@@ -239,6 +239,9 @@ class SpindleRunIn(BASE):
   spindleRunIn_work_id = Column(String(16))               #編  號
   spindleRunIn_spindle_id = Column(Integer, ForeignKey('spindle.id'))     #主軸
   spindleRunIn_employer = Column(Integer, ForeignKey('user.id'))          #員工
+  #spindleRunIn_emp_id = Column(String(4))          #員工編號
+  #spindleRunIn_spindle_cat = Column(String(30))    #型號
+
   spindleRunIn_date = Column(String(10))            #測試日期
   isRemoved = Column(Boolean, default=True)
   #層級刪除功能，當一個SpindleRunIn記錄被刪除時，與之相關的RunInData記錄也會自動刪除。

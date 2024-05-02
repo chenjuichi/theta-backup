@@ -438,7 +438,7 @@ export default {
       let temp_array = [];
       let i_len = this.temp_desserts.length;
       //let j_len = 0;
-      console.log("i_len:", i_len);
+      //console.log("i_len:", i_len);
       for (let i = 0; i < i_len; i++) {
         let temp_obj = {
           "id": this.temp_desserts[i].id,

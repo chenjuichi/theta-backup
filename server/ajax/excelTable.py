@@ -3,10 +3,8 @@ import datetime
 import pathlib
 import csv
 
-# ------------------------------------------------------------------
-
+import pymysql
 from sqlalchemy import exc
-
 
 import openpyxl
 from openpyxl import Workbook, load_workbook
@@ -14,11 +12,9 @@ from openpyxl.styles import Font, Alignment, PatternFill
 from database.tables import User, InTag, Grid, Spindle, SpindleRunIn, RunInData, Session
 from flask import Blueprint, jsonify, request, current_app
 
-from dotenv import load_dotenv
+excelTable = Blueprint('excelTable', __name__)
 
 # ------------------------------------------------------------------
-
-excelTable = Blueprint('excelTable', __name__)
 
 def pad_zeros(str):
     #length = len(str)
@@ -28,25 +24,28 @@ def pad_zeros(str):
     #    return str.zfill(length + 3)
 
 
+@excelTable.route("/fetchGlobalVar", methods=['GET'])
+def fetch_global_var():
+  print("fetchGlobalVar....")
+
+  global global_var
+  return jsonify({'value': global_var})
+
+
 @excelTable.route("/readAllExcelFiles", methods=['GET'])
 def read_all_excel_files():
   print("readAllExcelFiles....")
 
-  return_value = True
+  global global_var
+  #return_value = True
   return_message1 = ''
   return_message2 = ''
 
   _repeat_excel_files = []
   _no_spindle_or_user_data = []
 
-  # 指定目錄path
-  #_base_dir = 'd:\\釸達輔導案\開發文件\跑合機匯出EXCEL'
-  #---
-  #_base_dir = current_app.config['baseDir']
-
-  load_dotenv()
-  _base_dir = os.getenv("baseDir2")
-  #---
+  _base_dir = current_app.config['baseDir']         # 2024-04-26 add
+  print("read excel files, dir: ", _base_dir)       # 2024-04-26 add
 
   # 讀取指定目錄下的所有檔案和目錄名稱
   #files_and_folders = os.listdir(_base_dir)
@@ -66,10 +65,16 @@ def read_all_excel_files():
 
   s = Session()
   #for item in files_and_folders:
+  file_count_total=0
+  file_count_ok=0
   for _file_name in files:
+    file_count_total +=1
     print(_file_name)
+
     existing_excel = s.query(SpindleRunIn).filter_by(spindleRunIn_excel_file = _file_name).first()
     _path = _base_dir + '\\' + _file_name
+    global_var = _path + ' 檔案讀取中...'
+
     workbook = openpyxl.load_workbook(filename = _path, read_only = True)
 
     if existing_excel or ('Sheet1' not in workbook.sheetnames):
@@ -85,7 +90,13 @@ def read_all_excel_files():
     _cat = str(sheet.cell(row = _spindle_cat_row, column = 1).value).strip()                   #主軸資料(spindle_cat)
     _spindleRunIn_work_id = sheet.cell(row = _id_row, column = _id_column).value  #工單
     _empID = pad_zeros(str(sheet.cell(row = _emp_id_row, column = 1).value).strip())                 #員工資料
-    _spindleRunIn_date = str(sheet.cell(row = _date_row, column = _date_column).value.date()) #測試日期
+    #_spindleRunIn_date = str(sheet.cell(row = _date_row, column = _date_column).value).strip() #測試日期
+    _spindleRunIn_date = sheet.cell(row=_date_row, column=_date_column).value
+    if isinstance(_spindleRunIn_date, datetime.datetime):
+        _spindleRunIn_date = _spindleRunIn_date.strftime('%Y-%m-%d')
+    else:
+        _spindleRunIn_date = str(_spindleRunIn_date).strip()
+
     print('read Sheet1 upper part ok...', _cat, _empID)
     _spindle = s.query(Spindle).filter_by(spindle_cat = _cat).first()
     _user = s.query(User).filter_by(emp_id = _empID).first()
@@ -93,8 +104,8 @@ def read_all_excel_files():
     if (not _spindle or not _user):
       temp_data = _file_name + ': ' + _cat + ', ' + _empID
       _no_spindle_or_user_data.append(temp_data)
-      return_value = False
-      return_message2 = '錯誤! 在excel檔案內, 系統沒有主軸或員工編號資料...'
+      #return_value = False
+      return_message2 = '錯誤! 在excel檔案內, 系統沒有' + _cat +'主軸或' + _empID + '員工編號資料...'
       print(return_message2)
       continue
     '''
@@ -114,7 +125,7 @@ def read_all_excel_files():
       continue
     '''
     #continue for loop
-    print('write data into SpindleRunIn table...')
+    print('write data into SpindleRunIn table...len type, ', len(_spindleRunIn_date), '#', _spindleRunIn_date, '#')
     new_spindle_runin = SpindleRunIn(
       spindleRunIn_excel_file = _file_name,
       spindleRunIn_customer = _spindleRunIn_customer,
@@ -170,6 +181,7 @@ def read_all_excel_files():
     runin_data_total_size = len(_results)
     _objects = []
     for x in range(runin_data_total_size):
+      file_count_ok += 1
       u = RunInData(
       spindleRunIn_id = spindle_runin_id,
       spindleRunIn_period = _results[x]['spindleRunIn_period'],
@@ -235,11 +247,19 @@ def read_all_excel_files():
   if (return_message1 != '' or return_message2 != ''):
     return_message = return_message1 + '\n' + return_message2
 
+  return_value = True
+  return_message='完成! 共有' + str(file_count_total) + '個excel檔案, 讀檔' + str(file_count_ok) + '個成功...'
+  if file_count_ok==0:
+    return_value = False
+    return_message = '錯誤! 讀取excel檔案不成功...'
+
   return jsonify({
     'status': return_value,
-    'no_data': _no_spindle_or_user_data,
-    'repeat_excel_files': _repeat_excel_files,
+    #'no_data': _no_spindle_or_user_data,
+    #'repeat_excel_files': _repeat_excel_files,
     'message': return_message,
+    'file_count_total': file_count_total,
+    'file_count_ok': file_count_ok,
   })
 
 
@@ -252,10 +272,8 @@ def list_runin_from_csv():
 
   _file_name = request_data['file_name']
   #---
-  #_base_dir = current_app.config['baseDir']
-
-  load_dotenv()
-  _base_dir = os.getenv("baseDir2")
+  _base_dir = current_app.config['baseDir']         # 2024-04-26 add
+  print("read excel files, dir: ", _base_dir)       # 2024-04-26 add
   #---
   _path = _base_dir + '\\' + _file_name
   print("path: ", _path)

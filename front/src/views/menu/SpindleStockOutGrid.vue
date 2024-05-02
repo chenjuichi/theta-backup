@@ -867,21 +867,21 @@ div.v-toolbar__title {
   color: blue !important;
 }
 
-::v-deep .v-data-table-header th:last-child span {
-  color: #1f4788 !important;
-}
+//::v-deep .v-data-table-header th:last-child span {
+//  color: #1f4788 !important;
+//}
 
-::v-deep .v-data-table-header th:nth-last-child(2) span {
-  color: #1f4788 !important;
-}
+//::v-deep .v-data-table-header th:nth-last-child(2) span {
+//  color: #1f4788 !important;
+//}
 
 ::v-deep .v-data-table-header th:nth-last-child(3) span {
   color: #1f4788 !important;
 }
 
-::v-deep .v-data-table-header th:nth-last-child(4) span {
-  color: #1f4788 !important;
-}
+//::v-deep .v-data-table-header th:nth-last-child(4) span {
+//  color: #1f4788 !important;
+//}
 
 ::v-deep header {
   height: 48px !important;

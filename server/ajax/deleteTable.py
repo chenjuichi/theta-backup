@@ -3,13 +3,9 @@ from sqlalchemy import func
 
 from database.tables import User, Spindle, Grid, OutTag, InTag, SpindleRunIn, Session
 
-#from werkzeug.security import generate_password_hash
-
 deleteTable = Blueprint('deleteTable', __name__)
 
-
 # ------------------------------------------------------------------
-
 
 @deleteTable.route("/removeUser", methods=['POST'])
 def remove_user():
@@ -23,62 +19,6 @@ def remove_user():
 
     s = Session()
     s.query(User).filter(User.emp_id == userID).update({'isRemoved': False})
-    s.commit()
-    s.close()
-
-    return jsonify({
-        'status': return_value,
-    })
-
-
-@deleteTable.route("/removeStockIn", methods=['POST'])
-def remove_stockIn():
-    print("removeStockIn....")
-    request_data = request.get_json()
-    inTag_id = (request_data['id'] or '')
-
-    print("data: ", inTag_id)
-
-    return_message = ''
-    return_value = True  # true: 資料正確, 註冊成功
-    if inTag_id == "":
-        return_value = False  # false: 資料不完全 註冊失敗
-        return_message = '資料錯誤!'
-
-    if return_value:
-        s = Session()
-        #s.query(InTag).filter(InTag.id == inTag_id).update(
-        #    {'isRemoved': False})
-        item = s.query(InTag).filter_by(id=inTag_id, isPrinted=False, isStockin=False).first()
-        s.delete(item)
-
-        s.commit()
-        s.close()
-
-    return jsonify({
-        'status': return_value,
-        'message': return_message,
-    })
-
-# update reagent's 'isRemoved'
-
-
-@deleteTable.route("/removeReagent", methods=['POST'])
-def remove_reagent():
-    print("removeReagent....")
-    request_data = request.get_json()
-    reagentID = request_data['ID']
-
-    return_value = True  # true: 資料正確, 註冊成功
-    if reagentID == "":
-        return_value = False  # false: 資料不完全 註冊失敗
-
-    s = Session()
-    # s.query(Reagent).filter(Reagent.reag_id ==
-    #                        reagentID).update({'isRemoved': False})
-    item = s.query(Reagent).filter_by(reag_id=reagentID).first()
-    s.delete(item)
-
     s.commit()
     s.close()
 
@@ -254,59 +194,6 @@ def remove_grid():
       'status': return_value,
   })
 
-'''
-# update product's 'isRemoved'
-@deleteTable.route("/removeProduct", methods=['POST'])
-def remove_product():
-    print("removeProduct....")
-    request_data = request.get_json()
-    productID = request_data['ID']
-
-    return_value = True  # true: 資料正確, 註冊成功
-    if productID == "":
-        return_value = False  # false: 資料不完全 註冊失敗
-
-    if return_value:
-      s = Session()
-      #s.query(Product).filter(Product.id ==
-      #                        productID).update({'isRemoved': False})
-      item = s.query(Product).filter_by(id=productID).first()
-      s.delete(item)
-
-      s.commit()
-      s.close()
-
-    return jsonify({
-      'status': return_value,
-      'message': return_message,
-    })
-
-
-# update department' 'isRemoved'
-@deleteTable.route("/removeDepartment", methods=['POST'])
-def remove_department():
-    print("removeDepartment....")
-    request_data = request.get_json()
-    departmentID = request_data['ID']
-
-    return_value = True  # true: 資料正確, 註冊成功
-    if departmentID == "":
-        return_value = False  # false: 資料不完全 註冊失敗
-
-    if return_value:
-        s = Session()
-        #s.query(Department).filter(Department.id ==
-        #                           departmentID).update({'isRemoved': False})
-        item = s.query(Department).filter_by(id=departmentID).first()
-        s.delete(item)
-
-        s.commit()
-        s.close()
-
-    return jsonify({
-        'status': return_value,
-    })
-'''
 
 # delete outtag item and update intag's stockOut_temp_count
 @deleteTable.route("/deleteStockOutAndStockInData", methods=['POST'])

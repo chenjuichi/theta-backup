@@ -155,7 +155,7 @@
         >
         </Toaster>
         <button @click="userLogin">登入</button>
-        <BR />  <p style="margin: 0px 0 30px;"> {{ 'Build 2024-04-23' }} </p>
+        <BR />  <p style="margin: 0px 0 30px;"> {{ 'Build 2024-04-30' }} </p>
       </div>
 
     </div>

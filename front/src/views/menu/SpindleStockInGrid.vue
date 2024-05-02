@@ -961,15 +961,16 @@ div.v-toolbar__title {
 ::v-deep .v-data-table-header th:nth-last-child(1) span {
   color: #1f4788 !important;
 }
-::v-deep .v-data-table-header th:nth-last-child(3) span {
-  color: #1f4788 !important;
-}
+//::v-deep .v-data-table-header th:nth-last-child(3) span {
+//  color: #1f4788 !important;
+//}
 ::v-deep .v-data-table-header th:nth-last-child(4) span {
   color: #1f4788 !important;
 }
-::v-deep .v-data-table-header th:nth-last-child(5) span {
-  color: red!important;
-}
+//::v-deep .v-data-table-header th:nth-last-child(5) span {
+//  //color: red!important;
+//  color: #1f4788 !important;
+//}
 
 ::v-deep header {
   height: 48px !important;

@@ -27,10 +27,16 @@
               <v-divider class="mx-4" inset vertical></v-divider>
               <v-spacer></v-spacer>
 
-              <v-text-field
-                v-model="search"
-                label="關鍵字查詢 (UPPER CASE ONLY)"
+                          <!--
+              <div v-for="(schedule1, index) in schedule" :key="index" class="records_container">
+            -->
+              <div class="records_container" v-show="time_isOK">
+                <div>自動讀檔倒數(hh:mm):</div><span>{{formattedHours}} : {{formattedMinutes}}</span>
+              </div>
+
+              <v-text-field v-model="search" label="關鍵字查詢 (UPPER CASE ONLY)"
                 class="mx-4"
+                style="position:relative; top: 5px;"
               ></v-text-field>
               <v-spacer></v-spacer>
 
@@ -131,7 +137,9 @@
                       </v-row>
                       <!-- 第5列-->
                       <v-row mt-10 align="center" justify="center" class="my-custom-for-line5">
-                        <v-progress-linear v-show="isLoading" indeterminate color="red" />
+                        <v-progress-linear v-show="isLoading" indeterminate color="indigo darken-2" height="25">
+                          <strong>{{globalVar}}</strong>
+                        </v-progress-linear>
                         <template>
                           <v-data-table
                             dense
@@ -257,9 +265,13 @@ export default {
       localStorage.setItem('loginedUser', JSON.stringify(userData));
     };
 
-    // 設定每3分鐘執行一次 myWork 函式
-    const timeValue = 3 * 60 * 1000;
+    // 設定每1分鐘執行一次 myWork 函式
+    const timeValue = 1 * 60 * 1000;
     this.intervalId = setInterval(this.listFileOK, timeValue);
+
+    // 設定每1秒鐘執行一次 myWork 函式
+    const secValue = 1 * 1000;
+    this.intervalIdForSec = setInterval(this.fetchGlobalVar, secValue);
   },
 
   data: () => ({
@@ -441,12 +453,21 @@ export default {
     load_SingleTable_ok: false,
     load_4thTable_ok: false,
     load_5thTable_ok: false,
+    //readAllExcelFiles_isOK: false,
 
     isLoading: false,
 
     intervalId: null,
+    intervalIdForSec: null,
     temp_file_ok: false,
     search: '',
+
+    schedule: [],
+
+    formattedHours: '00',
+    formattedMinutes: '00',
+    time_isOK: false,
+    globalVar: '',
   }),
 
   computed: {
@@ -525,9 +546,21 @@ export default {
       if (val) {
         this.desserts = Object.assign([], this.temp_desserts);
 
+        this.listDotEnv();
+
         this.load_SingleTable_ok = false;
       }
-    }
+    },
+    /*
+    readAllExcelFiles_isOK(val) {
+      if (val) {
+        this.showTosterForOK(res.data.message)
+        this.close();
+        this.$router.go(0);
+        this.readAllExcelFiles_isOK=false;
+      }
+    },
+    */
   },
 
   created () {
@@ -544,8 +577,62 @@ export default {
   },
 
   methods: {
+    initialize() {
+      //this.load_SingleTable_ok=false;
+      this.listSpindleRunIns();
+    },
+
+    listSpindleRunIns() {
+      console.log("listSpindleRunIns()...");
+
+      this.load_SingleTable_ok = false;
+      const path = '/listSpindleRunIns';
+      axios.get(path)
+      .then((res) => {
+        this.temp_desserts = res.data.outputs;
+        console.log("GET ok, total records:", res.data.outputs.length);
+        this.load_SingleTable_ok = true;
+      })
+      .catch((error) => {
+        console.error(error);
+        this.showTosterForError('錯誤! API連線問題...')
+      });
+    },
+
+    formatTime() {
+      console.log("formatTime(), ", this.schedule[0][0], this.schedule[0][1])
+
+      const targetTime = new Date(); // 取得現在的時間
+      targetTime.setHours(this.schedule[0][0]); // 設置目標時間的小時
+      targetTime.setMinutes(this.schedule[0][1]); // 設置目標時間的分鐘
+      targetTime.setSeconds(0); // 將秒數設置為 0，以確保精確度
+
+      let now = new Date();
+      let remainingTime = targetTime - now; // 計算剩餘時間（毫秒）
+
+      if (remainingTime <= 0) {
+        //clearInterval(this.intervalId); // 如果時間到了，停止計時器
+        remainingTime = 0; // 將剩餘時間設置為 0
+        this.time_isOK = false;
+      } else {
+        this.time_isOK = true;
+
+        const hours = Math.floor(remainingTime / (1000 * 60 * 60));
+        const minutes = Math.floor((remainingTime % (1000 * 60 * 60)) / (1000 * 60));
+        //console.log("date format 1: ", hours , minutes)
+
+        // 格式化時和分數字，例如 1:3 -> 01:03
+        this.formattedHours = String(hours).padStart(2, '0');
+        this.formattedMinutes = String(minutes).padStart(2, '0');
+        //console.log("date format 2: ", this.formattedHours , ':', this.formattedMinutes)
+      }
+
+    },
+
     listFileOK() {
-      console.log("listFileOK(), Axios get data...")
+      console.log("listFileOK()...")
+
+      this.formatTime();
 
       const path = '/listFileOK';
       axios.get(path)
@@ -557,29 +644,12 @@ export default {
         console.log(hour + ":" + minute);
         console.log("GET ok, file_ok flag value is: ", res.data.outputs);
 
-        if (this.temp_file_ok)
+        if (this.temp_file_ok) {
+          clearInterval(this.intervalId); // 如果時間到了，停止計時器
+          this.formattedHours= '00';
+          this.formattedMinutes= '00';
           this.$router.go(0);
-      })
-      .catch((error) => {
-        console.error(error);
-        this.showTosterForError('錯誤! API連線問題...')
-      });
-    },
-
-    readAllExcelFiles() {
-      console.log("readAllExcelFiles, Axios get data...");
-
-      this.isLoading = true;
-      const path = '/readAllExcelFiles';
-      axios.get(path)
-      .then((res) => {
-        this.isLoading = false;
-
-        if (res.data.status) {
-          this.close();
-          this.$router.go(0);
-        } else {
-          this.showTosterForError(res.data.message)
+          console.log("file_ok flag value is: ", res.data.outputs, "end timer");
         }
       })
       .catch((error) => {
@@ -588,24 +658,68 @@ export default {
       });
     },
 
-    initialize() {
-      this.load_SingleTable_ok=false;
-      this.listSpindleRunIns();
-    },
+    listDotEnv() {
+      console.log("listDotEnv()...")
 
-    listSpindleRunIns() {
-      const path = '/listSpindleRunIns';
-      console.log("listSpindleRunIns, Axios get data...")
+      const path = '/listDotEnv';
       axios.get(path)
       .then((res) => {
-        this.temp_desserts = res.data.outputs;
-        console.log("GET ok, total records:", res.data.outputs.length);
-        this.load_SingleTable_ok = true;
+        //let numArr1 = res.data.schedule_1.map(Number);
+        let numArr1 = res.data.schedule_1.length ? res.data.schedule_1.map(Number) : [];
+        let numArr2 = res.data.schedule_2.length ? res.data.schedule_2.map(Number) : [];
+        //this.schedule= numArr1.concat(numArr2);
+        this.schedule= [];
+        this.schedule.push(numArr1);
+        //console.log("hh:mm ", numArr1[0] + ":" + numArr1[1]);
+        this.formatTime();
+        //this.schedule.push(numArr2);
       })
       .catch((error) => {
         console.error(error);
-        this.showTosterForError('錯誤! API連線問題...')
+        this.showTosterForError('錯誤! API連線問題...');
       });
+    },
+
+    readAllExcelFiles() {
+      console.log("readAllExcelFiles, Axios get data...");
+      //this.readAllExcelFiles_isOK=false;
+      this.isLoading = true;
+      const path = '/readAllExcelFiles';
+      axios.get(path)
+      .then((res) => {
+        this.isLoading = false;
+        if (res.data.status) {
+          //this.readAllExcelFiles_isOK=true;
+          //this.showTosterForOK(res.data.message);
+          this.close();
+          //this.$router.go(0);
+          this.$router.push('/runIn');
+          //this.readAllExcelFiles_isOK=false;
+        } else {
+          this.showTosterForError(res.data.message);
+        }
+      })
+      .catch((error) => {
+        this.isLoading = false;
+        console.error(error);
+        this.showTosterForError('錯誤! API連線問題...');
+      });
+    },
+
+    fetchGlobalVar() {
+      if (this.isLoading) {
+        console.log("fetchGlobalVar()...");
+
+        const path = '/fetchGlobalVar';
+        axios.get(path)
+        .then((res) => {
+          this.globalVar = res.data.value;
+        })
+        .catch((error) => {
+          console.error(error);
+          this.showTosterForError('錯誤! API連線問題...');
+        });
+      }
     },
 
     handleFileSelected(fileName) {
@@ -834,11 +948,19 @@ export default {
       this.rightDialog = false
       //this.$router.push('/navbar');
     },
+
+    filterOnlyCapsText (value, search, item) {
+      return value != null &&
+        search != null &&
+        typeof value === 'string' &&
+        value.toString().toLocaleUpperCase().indexOf(search) !== -1
+    },
   },
 
   beforeDestroy() {
     // 離開Vue之前, 清除interval
     clearInterval(this.intervalId);
+    clearInterval(this.intervalIdForSec);
     // 離開Vue之前, 清除 window.onpopstate 的處理程序
     window.onpopstate = null;
   },
@@ -969,4 +1091,14 @@ div.v-toolbar__title {
   100% { opacity: 1; }
 }
 
+::v-deep .records_container {
+    display: flex; /* 使用 flexbox */
+    align-items: center; /* 垂直置中 */
+    gap: 5px; /* 設定元素之間的間距 */
+    position: relative;
+    left: -110px;
+    top: 20px;
+    font-size: 12px;
+    font-weight: bold;
+}
 </style>

@@ -3,8 +3,7 @@ import datetime
 import pathlib
 import csv
 
-# ------------------------------------------------------------------
-
+import pymysql
 from sqlalchemy import exc
 
 import openpyxl
@@ -15,26 +14,19 @@ from flask import Blueprint, jsonify, request, current_app
 
 from apscheduler.schedulers.background import BackgroundScheduler
 
-from dotenv import load_dotenv
+from dotenv import dotenv_values
 
 scheduleDoTable = Blueprint('scheduleDoTable', __name__)
-
-file_ok = False
 
 # ------------------------------------------------------------------
 
 def do_read_all_excel_files():
-  global file_ok
-
   print("do_read_all_excel_files()....")
 
-  # 指定目录路径
-  #_base_dir = 'd:\\釸達輔導案\開發文件\跑合機匯出EXCEL'
   #---
-  #_base_dir = current_app.config['baseDir']
-
-  load_dotenv()
-  _base_dir = os.getenv("baseDir2")
+  _base_dir = current_app.config['baseDir']         # 2024-04-26 add
+  print("read excel files, dir: ", _base_dir)       # 2024-04-26 add
+  env_vars = dotenv_values(_base_dir)
   #---
 
   # 讀取指定目錄下的所有指定檔案名稱
@@ -68,13 +60,19 @@ def do_read_all_excel_files():
     _cat = str(sheet.cell(row = _spindle_cat_row, column = 1).value).strip()                   #主軸資料(spindle_cat)
     _spindleRunIn_work_id = sheet.cell(row = _id_row, column = _id_column).value  #工單
     _empID = str(sheet.cell(row = _emp_id_row, column = 1).value).strip().zfill(4)                 #員工資料
-    _spindleRunIn_date = str(sheet.cell(row = _date_row, column = _date_column).value.date()) #測試日期
+    #_spindleRunIn_date = str(sheet.cell(row = _date_row, column = _date_column).value.date()) #測試日期
+    _spindleRunIn_date = sheet.cell(row=_date_row, column=_date_column).value
+    if isinstance(_spindleRunIn_date, datetime.datetime):
+        _spindleRunIn_date = _spindleRunIn_date.strftime('%Y-%m-%d')
+    else:
+        _spindleRunIn_date = str(_spindleRunIn_date).strip()
+
     print('read Sheet1 upper part ok...', _cat, _empID)
     _spindle = s.query(Spindle).filter_by(spindle_cat = _cat).first()
     _user = s.query(User).filter_by(emp_id = _empID).first()
 
     if (not _spindle or not _user):
-      return_message2 = '錯誤! 在excel檔案內, 系統沒有主軸或員工編號資料...'
+      return_message2 = '錯誤! 在excel檔案內, 系統沒有' + _cat + '主軸或' + _empI + '員工編號資料...'
       print(return_message2)
       continue
     #continue for loop
@@ -196,19 +194,7 @@ def do_read_all_excel_files():
 
   s.close()
   #end do_read_all_excel_files()
-  file_ok = True
 
-'''
-def my_job():
-  print("hello, Scheduled job is running...")
+  current_app.config['file_ok'] = True
+  print("end do_read_all_excel_files()....")
 
-  do_read_all_excel_files()
-  #end my_job()
-
-# 注册定时任务到调度器
-scheduler = BackgroundScheduler()
-scheduler.add_job(my_job, 'cron', hour=14, minute=40)
-
-# 开始执行调度器中注册的任务
-scheduler.start()
-'''

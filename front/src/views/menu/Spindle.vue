@@ -188,6 +188,7 @@
                   </v-card-actions>
                 </v-card>
               </v-dialog>
+
               <v-dialog v-model="dialogDelete" max-width="500px">
                 <v-card>
                   <v-card-title class="text-h5">確定刪除這筆資料?</v-card-title>
@@ -269,6 +270,7 @@ import axios from 'axios';
 
 import Common from '../../mixin/common.js'
 import Notification from '../../mixin/notification.js'
+import ListSpindles from '../../mixin/notification.js'
 
 import { _createCSSWithConstants } from '../../mixin/constant.js';
 import { _thetaSpindleTypes } from '../../mixin/constant.js';
@@ -282,7 +284,7 @@ import { _thetaSpindleS1Nm } from '../../mixin/constant.js';
 export default {
   name: 'Spindle',
 
-  mixins: [Common, Notification],
+  mixins: [Common, Notification, ListSpindles],
 
   mounted() {
     // if back button is pressed
@@ -457,8 +459,8 @@ export default {
         this.listReagents();
       }
     },
-    */
-    /*
+
+
     load_4thTable_ok(val) {
       if (val) {
         this.suppliers = Object.assign([], this.temp_suppliers);
@@ -468,16 +470,16 @@ export default {
         this.load_4thTable_ok=false;
       }
     },
-    */
-    /*
+
+
     load_3thTable_ok(val) {
       if (val) {
         this.products = Object.assign([], this.temp_products);
         this.load_3thTable_ok=false;
       }
     },
-    */
-   /*
+
+
     load_2thTable_ok(val) {
       if (val) {
         this.suppliers = Object.assign([], this.temp_suppliers);
@@ -522,7 +524,7 @@ export default {
     },
 
     listDotEnv() {
-      console.log("listDotEnv(), Axios get data...")
+      console.log("listDotEnv()...")
 
       const path = '/listDotEnv';
       axios.get(path)

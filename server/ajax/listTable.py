@@ -1,13 +1,11 @@
 import math
 import random
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, current_app
 from sqlalchemy.sql import func
 # from werkzeug.security import check_password_hash
 from database.tables import User, Permission, Spindle, Grid, association_table
 from database.tables import SpindleRunIn, RunInData
 from database.tables import InTag, OutTag, Session
-
-from ajax.scheduleDoTable import file_ok
 
 from flask_cors import CORS
 
@@ -15,21 +13,23 @@ from operator import itemgetter
 
 from dotenv import dotenv_values
 
+import pymysql
+from sqlalchemy import exc
+
 listTable = Blueprint('listTable', __name__)
 
 # ------------------------------------------------------------------
 
 @listTable.route("/listFileOK", methods=['GET'])
 def list_file_ok():
-  global file_ok
-
   print("listFileOK....")
 
-  _file_ok = file_ok
+  _file_ok = current_app.config['file_ok']
   print("file_ok flag value is: ", _file_ok)
 
-  if file_ok:
-    file_ok = False
+  if _file_ok:
+    current_app.config['file_ok'] = False
+    #file_ok = False
 
   return jsonify({
     'outputs': _file_ok
@@ -40,12 +40,15 @@ def list_file_ok():
 def list_dot_env():
   print("listDotEnv....")
 
-  env_path = "./.env"  # 主目錄(server)下的 .env 文件path
+  env_path = current_app.config['envDir']
+  #env_path = "./.env"                        # 主目錄下的 .env 文件path
+  #env_path = "d:\\theta-asrs\\asrs\\.env"     # 2024-04-26 modify
   env_vars = dotenv_values(env_path)
 
- #array_list_str = env_vars["ARRAY_LIST"]
-  #array_list = array_list_str.split(",")
-  #print(array_list)  # 输出: ['20', '30', '40']
+  schedule_1_str= env_vars["schedule_1_24HHMM"]
+  schedule_1 = schedule_1_str.split(",")
+  schedule_2_str= env_vars["schedule_2_24HHMM"]
+  schedule_2 = schedule_2_str.split(",")
 
   #主軸型號
   spindle_cat_str= env_vars["spindle_cat1"]
@@ -97,6 +100,8 @@ def list_dot_env():
   spindle_handles5 = spindle_handles_str.split(",")
 
   return jsonify({
+    'schedule_1': schedule_1,
+    'schedule_2': schedule_2,
     'spindle_cat1': spindle_cat1,
     'spindle_cat2': spindle_cat2,
     'spindle_cat3': spindle_cat3,

@@ -76,7 +76,7 @@
 
             <div>
                 <b-avatar variant="primary" style="width: 1.5rem; height: 1.5rem; margin-bottom: 3pt;"></b-avatar>
-                關於 build 2024-04-23
+                關於 build 2024-04-30
             </div>
 
         </b-dropdown-item>

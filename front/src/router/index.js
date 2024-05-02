@@ -48,7 +48,7 @@ const routes = [
 
   //{ path: '/gridsForLed',  name: 'GridsForLed', component: GridsForLed},
 
-  { path: '/dep',  name: 'Department', component: Department},
+  //{ path: '/dep',  name: 'Department', component: Department},
   //{ path: '/sup',  name: 'Supplier', component: Supplier},
   //{ path: '/supAndPrd',  name: 'SupplierForProduct', component: SupplierForProduct},
   { path: '/perm',  name: 'Permission', component: Permission},
