@@ -73,15 +73,15 @@ def createUser():
     tempID = ""
     tempName = ""
     if emp_id == "" or emp_name == "" or sPWD == "":
-        return_value = False  # false: 資料不完全 註冊失敗
+      return_value = False  # false: 資料不完全 註冊失敗
 
-    dep = (request_data['dep'] or '')  # convert null into empty string
+    #dep = (request_data['dep'] or '')  # convert null into empty string
     # code = request_data['perm_id']
 
     s = Session()
-    department = s.query(Department).filter_by(dep_name=dep).first()
-    if not department:
-        return_value = False  # if the user's department does not exist
+    #department = s.query(Department).filter_by(dep_name=dep).first()
+    #if not department:
+    #    return_value = False  # if the user's department does not exist
 
     # permission = s.query(Permission).filter_by(auth_code=code).first()
     # if not permission:
@@ -101,7 +101,7 @@ def createUser():
         new_user = User(emp_id=emp_id,
                         emp_name=emp_name,
                         password=generate_password_hash(sPWD, method='sha256'),
-                        dep_id=department.id,
+                        #dep_id=department.id,
                         # perm_id=permission.id,
                         perm_id=4,  # first permission,auth_code=0:none
                         setting_id=new_user_setting.id,)
@@ -400,7 +400,7 @@ def create_stockout_grids():
     _intag = s.query(InTag).filter_by(work_id=_work_id).first()
 
     if (not _user) or ( not _intag):
-        return_value = False  # if the user's department does not exist
+        return_value = False
         return_message='找不到資料!'
 
     _intag.isRemoved = False

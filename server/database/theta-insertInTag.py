@@ -9,15 +9,15 @@ from sqlalchemy import func
 s = Session()
 
 #新增 intag資料
-new_intag = InTag(work_id='20240320111', user_id=4, spindle_id=1, date='113/04/02', period='113/04/11')  #1
+new_intag = InTag(work_id='20240320111', user_id=4, spindle_id=1, date='113/04/02', period='113/05/11')  #1
 s.add(new_intag)
-new_intag = InTag(work_id='20240315111', user_id=4, spindle_id=2, date='113/04/02', period='113/04/12')  #2
+new_intag = InTag(work_id='20240315111', user_id=4, spindle_id=2, date='113/04/02', period='113/05/12')  #2
 s.add(new_intag)
-new_intag = InTag(work_id='20240310111', user_id=4, spindle_id=3, date='113/04/02', period='113/04/15')  #3
+new_intag = InTag(work_id='20240310111', user_id=4, spindle_id=3, date='113/04/02', period='113/05/15')  #3
 s.add(new_intag)
-new_intag = InTag(work_id='20240410111', user_id=4, spindle_id=1, date='113/04/10', period='113/04/20')  #4
+new_intag = InTag(work_id='20240410111', user_id=4, spindle_id=1, date='113/04/10', period='113/05/20')  #4
 s.add(new_intag)
-new_intag = InTag(work_id='20240410121', user_id=4, spindle_id=16, date='113/04/11', period='113/04/21')  #5
+new_intag = InTag(work_id='20240410121', user_id=4, spindle_id=16, date='113/04/11', period='113/05/21')  #5
 s.add(new_intag)
 
 try:

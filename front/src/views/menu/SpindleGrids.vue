@@ -83,6 +83,7 @@
                                   v-model="editedItem.grid_layout"
                                   :min="1"
                                   :max="99"
+
                                   :step="1"
                                   :readonly="formTitle === '編輯資料'"
                                   :class="{'v-input-disable': formTitle === '編輯資料'}"
@@ -188,6 +189,7 @@
 <script>
 import axios from 'axios';
 import VueNumericInput from 'vue-numeric-input';
+//import MNumberInput from '@mtcmedia/vue-number-input'
 import Notification from '../../mixin/notification.js'
 
 import Common from '../../mixin/common.js'
@@ -268,6 +270,9 @@ export default {
     desserts: [],
     temp_desserts: [],
 
+    station_max_layout: {},
+    //maxNum: 99,
+
     editedIndex: -1,
     editedItem: {
       id: 0,
@@ -300,6 +305,27 @@ export default {
   computed: {
     formTitle() {
       return this.editedIndex === -1 ? '新增資料' : '編輯資料'
+    },
+
+    maxNum() {
+      console.log("this.editItem.grid_station: ", this.editedItem.grid_station);
+      let key = parseInt(this.editedItem.grid_station)-1
+      let return_val=Object.values(this.station_max_layout)[key] + 1;
+      console.log("return_val: ", return_val);
+      return return_val;
+      /*
+      if (this.editedItem.grid_station=='1')
+            //let return_val=Object.values(this.station_max_layout)[key] + 1;
+
+        return 5;
+      //let return_val=Object.values(this.station_max_layout)[key] + 1;
+      if (this.editedItem.grid_station=='2')
+        return 6;
+      if (this.editedItem.grid_station=='3')
+        return 7;
+      if (this.editedItem.grid_station=='4')
+        return 8;
+      */
     },
 
     checkDataForSaveButton() {
@@ -343,6 +369,7 @@ export default {
     load_SingleTable_ok(val) {
       if (val) {
         this.listOrderFromProcess();
+        this.findMaxLayout();
         this.load_SingleTable_ok=false;
 
         this.listSpindles();
@@ -365,10 +392,8 @@ export default {
 
     load_3thTable_ok(val) {
       if (val) {
-        Object.assign(this.desserts[this.editedIndex], this.editedItem)
-
-        this.editedItem = Object.assign({}, this.defaultItem)
-
+        Object.assign(this.desserts[this.editedIndex], this.editedItem);
+        this.editedItem = Object.assign({}, this.defaultItem);
         this.close();
 
         this.load_3thTable_ok = false;
@@ -437,8 +462,7 @@ export default {
 
       let temp_array = [];
       let i_len = this.temp_desserts.length;
-      //let j_len = 0;
-      //console.log("i_len:", i_len);
+
       for (let i = 0; i < i_len; i++) {
         let temp_obj = {
           "id": this.temp_desserts[i].id,
@@ -453,6 +477,18 @@ export default {
       }
 
       this.desserts = Object.assign([], temp_array);
+    },
+
+    findMaxLayout() {
+      console.log("findMaxLayout()...");
+
+      this.desserts.forEach(item => {
+        if (!this.station_max_layout[item.grid_station] || parseInt(item.grid_layout) > this.station_max_layout[item.grid_station]) {
+          this.station_max_layout[item.grid_station] = parseInt(item.grid_layout);
+        }
+      });
+
+      console.log("station_max_layout: ", this.station_max_layout, typeof(this.station_max_layout));
     },
     /*
     fieldFocus() {
@@ -474,7 +510,7 @@ export default {
       this.editedIndex = this.desserts.indexOf(item)
       let tmp_item = Object.assign({}, item)
 
-      tmp_item.grid_station = (item.grid_station == '待跑合A區') ? "1" : (item.editedItem.grid_station == '待校正B區') ? "2" : (item.editedItem.grid_station == '待校正C區') ? "3" : (item.editedItem.grid_station == '異常處理D區') ? "4" : "1";
+      tmp_item.grid_station = (item.grid_station == '待跑合A區') ? "1" : (item.grid_station == '待校正B區') ? "2" : (item.grid_station == '待校正C區') ? "3" : (item.grid_station == '異常處理D區') ? "4" : "1";
       let tk=' / '
       let [t1, t2] = item.grid_type_and_cat.trim().split(tk);
       tmp_item.grid_type = (t1 == '銑削/研磨主軸(自動換刀)') ? "1" : (t1 == '研磨主軸(手動換刀)') ? "2" : (t1 == '修砂主軸(手動換刀)') ? "3" : "0";
@@ -626,15 +662,16 @@ export default {
     },
     */
     permCloseFun () {
-      this.permDialog = false
       console.log("press permission Close Button...");
+
+      this.permDialog = false
       this.$router.push('/navbar');
     },
 
     rightCloseFun() {
-      this.rightDialog = false
       console.log("press permission Close Button...");
-      //this.$router.push('/navbar');
+
+      this.rightDialog = false
     },
 
     handleKeyDown(event) {

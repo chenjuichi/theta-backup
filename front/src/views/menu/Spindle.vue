@@ -73,14 +73,6 @@
 
                       <!-- 第2列-->
                       <v-row>
-                      <!--
-                        <v-col cols="12" md="4">
-                          <v-text-field
-                            label="外徑"
-                            v-model="newItemIn"
-                          ></v-text-field>
-                        </v-col>
-                      -->
                         <v-col cols="12" md="4">
                           <v-select
                             :items="spindle_outer_array"
@@ -144,7 +136,6 @@
                             v-model="editedItem.spindle_nm"
                           ></v-select>
                         </v-col>
-                        <!--<v-col cols="12" md="4"></v-col>  -->
                       </v-row>
                       <!-- 第4列-->
                       <v-row>
@@ -393,30 +384,17 @@ export default {
     reagents: [],
 
     load_SingleTable_ok: false,
-    //load_2thTable_ok: false,
-    //load_3thTable_ok: false,
-    //load_4thTable_ok: false,
-    //load_5thTable_ok: false,
 
-    //spindle_type: '1',
-    //spindle_cat_array: ['TH-120.01(400V)','TH-120.02(230V)','TH-150.01(380V)','TH-150.02(220V)', 'THS-210.01(400V)', 'THS-255.01(400V)', 'THG-170.01(400V)', 'THAV-100', 'THSGD-H140', 'THSGD-H150'],
     spindle_cat_array: [],
-    //spindle_inner_array: ['17','20', '25', '40', '65', '70','80','90','100'],
     spindle_inner_array: [],
-    //spindle_rpm_array: ['20000','24000', '30000','36000','42000','50000','60000','70000'],
     spindle_rpm_array: [],
 
     spindle_lubrication: '1',
     spindle_cooling: '1',
-    //spindle_outer_array: _thetaSpindleOuters,
     spindle_outer_array: [],
-    //spindle_motor_array: _thetaSpindleMotorType,
     spindle_motor_array: [],
-    //spindle_S1Kw_array: _thetaSpindleS1Kw,
     spindle_S1Kw_array: [],
-    //spindle_S1Nm_array: _thetaSpindleS1Nm,
     spindle_S1Nm_array: [],
-    //spindle_handles_array: _thetaHandles,
     spindle_handles_array: [],
   }),
 
@@ -697,25 +675,27 @@ export default {
     },
 
     save() {
-      console.log("click save button, editedIndex: ", this.editedIndex);
-      let tmp_str2 = (this.editedItem.spindle_type === '1') ? "銑削/研磨主軸(自動換刀)" : (this.editedItem.spindle_type === '2') ? "研磨主軸(手動換刀)" : (this.editedItem.spindlegrid_type === '3') ? "修砂主軸(手動換刀)" : "";
-      let exists = this.desserts.some(obj => obj.spindle_type == tmp_str2 && obj.spindle_cat == this.editedItem.spindle_cat);
-      //console.log("比較: ", exists, this.editedIndex, this.editedItem, this.desserts)
+      console.log("save(), ", this.editedIndex);
 
-      if (exists) {
-        this.showTosterForError('錯誤! 資料重複!')
-      } else {
+      let tmp_str2 = (this.editedItem.spindle_type === '1') ? "銑削/研磨主軸(自動換刀)" : (this.editedItem.spindle_type === '2') ? "研磨主軸(手動換刀)" : (this.editedItem.spindlegrid_type === '3') ? "修砂主軸(手動換刀)" : "";
+      //let exists = this.desserts.some(obj => obj.spindle_type == tmp_str2 && obj.spindle_cat == this.editedItem.spindle_cat);
+
+      //if (exists) {
+      //  this.showTosterForError('錯誤! 資料重複!')
+      //} else {
         let newArr = {}
         Object.assign(newArr, this.editedItem)
+        newArr.spindle_motor=(newArr.spindle_motor=='空白')?'':newArr.spindle_motor;
         if (this.editedIndex == -1) {       //add
             this.createSpindle(newArr);
-            newArr.spindle_motor=(newArr.spindle_motor=='空白')?'':newArr.spindle_motor;
+            //newArr.spindle_motor=(newArr.spindle_motor=='空白')?'':newArr.spindle_motor;
             this.desserts.push(newArr);
         } else {                            //edit
           this.updateSpindle(newArr);
+          newArr.spindle_type=tmp_str2;
           Object.assign(this.desserts[this.editedIndex], newArr);
         }
-      }
+      //}
       this.close();
     },
 
@@ -740,7 +720,7 @@ export default {
     },
 
     createSpindle(object) {
-      console.log("createSpindle()..., ", object);
+      console.log("createSpindle(), ", object);
 
       const path='/createSpindle';
       let payload = Object.assign({}, object);
@@ -796,15 +776,16 @@ export default {
     },
     */
     permCloseFun() {
-      this.permDialog = false
       console.log("press permission Close Button...");
+
+      this.permDialog = false
       this.$router.push('/navbar');
     },
 
     rightCloseFun() {
-      this.rightDialog = false
       console.log("press permission Close Button...");
-      //this.$router.push('/navbar');
+
+      this.rightDialog = false
     },
   },
 }

@@ -50,8 +50,6 @@ def do_read_all_excel_files():
     workbook = openpyxl.load_workbook(filename = _path, read_only = True)
 
     if existing_excel or ('Sheet1' not in workbook.sheetnames):
-      return_message1 = '錯誤! excel檔名重複或檔案內沒有Sheet1...'
-      print(return_message1)
       continue
     #continue for loop
     print('Sheet1 exists')
@@ -72,8 +70,6 @@ def do_read_all_excel_files():
     _user = s.query(User).filter_by(emp_id = _empID).first()
 
     if (not _spindle or not _user):
-      return_message2 = '錯誤! 在excel檔案內, 系統沒有' + _cat + '主軸或' + _empI + '員工編號資料...'
-      print(return_message2)
       continue
     #continue for loop
     print('write data into SpindleRunIn table...')

@@ -83,17 +83,13 @@ def update_user():
     if _emp_id == "" or _emp_name == "":
         return_value = False  # false: 資料不完全 註冊失敗
 
-    dep = (request_data['dep'] or '')  # convert null into empty string
 
     s = Session()
 
-    department = s.query(Department).filter_by(dep_name=dep).first()
-    if not department:
-        return_value = False  # if the user's department does not exist
-
     if return_value:
         s.query(User).filter(User.emp_id == _emp_id).update(
-            {"emp_name": _emp_name, "dep_id": department.id})
+            #{"emp_name": _emp_name, "dep_id": department.id})
+            {"emp_name": _emp_name, })
         s.commit()
 
     s.close()
@@ -199,7 +195,8 @@ def update_grid():
 
   #找出儲位/主軸資料
   existing_grid = s.query(Grid).filter(Grid.id == _id).first()
-  existing_spindle = s.query(Spindle).filter_by(spindle_type=_existing_grid_type, spindle_cat=_existing_grid_cat, grid_id=_id).first()
+  #existing_spindle = s.query(Spindle).filter_by(spindle_type=_existing_grid_type, spindle_cat=_existing_grid_cat, grid_id=_id).first()
+  existing_spindle = s.query(Spindle).filter_by(spindle_type=_existing_grid_type, spindle_cat=_existing_grid_cat).first()
   new_spindle = s.query(Spindle).filter_by(spindle_type=_new_grid_type, spindle_cat=_new_grid_cat).first()
   #有spindle資料
   if new_spindle:

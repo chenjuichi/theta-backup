@@ -77,6 +77,11 @@
           @click:append="() => (eyeShow1 = !eyeShow1)"
           :type="eyeShow1 ? 'password' : 'text'"
           v-model='registerUser.password'
+          single-line
+          :rules="rulesForEmpPass"
+          counter
+          maxlength="6"
+
         />
         <!-- {{ ErrMsg }} -->
         <small class="msgErr" v-text= "passwordErrMsg"></small>
@@ -91,6 +96,9 @@
           :type="eyeShow1 ? 'password' : 'text'"
           :rules="[rulesForPSW]"
           v-model='registerUser.confirmPassword'
+          single-line
+          counter
+          maxlength="6"
         />
 
         <!-- {{ ErrMsg }} -->
@@ -155,7 +163,7 @@
         >
         </Toaster>
         <button @click="userLogin">登入</button>
-        <BR />  <p style="margin: 0px 0 30px;"> {{ 'Build 2024-04-30' }} </p>
+        <BR />  <p style="margin: 0px 0 30px;"> {{ 'Build 2024-05-07' }} </p>
       </div>
 
     </div>
@@ -241,6 +249,8 @@ export default {
 
       //rulesForEmpID: [v => v.length <= 4 || '最大4位數字'],
       rulesForEmpID: [v => !v || v.length <= 4 || '最大4位數字'],
+      rulesForEmpPass: [v => !v || v.length >= 4  || v.length <= 6 || '4~6位數'],
+      rulesForEmpCfrPass: [v => !v || v.length >= 4  || v.length <= 6 || '4~6位數'],
       load_SingleTable_ok: false,   //for get department table data
     };
   },
@@ -348,6 +358,8 @@ export default {
       console.log("result: ", this.registerUser.password, result);
       this.passwordErrMsg = '';
       if (result == null && (len>=4 && len<=6)) {
+      //if (result == null) {
+        console.log("error...");
         this.passwordErrMsg = '資料格式或資料長度錯誤!';
       }
     },  //end 'password': function()

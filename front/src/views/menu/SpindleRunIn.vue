@@ -682,7 +682,7 @@ export default {
 
     readAllExcelFiles() {
       console.log("readAllExcelFiles, Axios get data...");
-      //this.readAllExcelFiles_isOK=false;
+
       this.isLoading = true;
       const path = '/readAllExcelFiles';
       axios.get(path)
@@ -721,7 +721,8 @@ export default {
     },
 
     handleFileSelected(fileName) {
-      console.log('Selected file:', fileName); //接收到的檔案名稱
+      console.log('handleFileSelected(), ', fileName); //接收到的檔案名稱
+
       this.isLoading = true;
       this.excel_file=fileName;
 
@@ -785,7 +786,7 @@ export default {
       this.listRunInData(item.id);
     },
 
-    deleteItem (item) {
+    deleteItem(item) {
       console.log("deleteItem: ", item);
 
       if (this.currentUser.perm >2) {
@@ -799,8 +800,7 @@ export default {
     },
 
     removeSpindleRunIn() {
-      //console.log("1. removeSpindleRunIn: ", item);
-      console.log("removeSpindleRunIn: ", this.editedItem);
+      console.log("removeSpindleRunIn(), ", this.editedItem);
 
       const path='/removeSpindleRunIn';
       //let payload = Object.assign({}, this.editedItem);
@@ -828,6 +828,8 @@ export default {
     },
 
     close() {
+      console.log('close()...');
+
       this.dialog = false;
       this.isLoading=false;
       this.$nextTick(() => {
@@ -837,7 +839,9 @@ export default {
       })
     },
 
-    closeDelete () {
+    closeDelete() {
+      console.log('closeDelete()...');
+
       this.dialogDelete = false
       this.$nextTick(() => {
         this.editedItem = Object.assign({}, this.defaultItem)
@@ -902,7 +906,7 @@ export default {
     },
 
     save() {
-      console.log("click save button, editedIndex: ", this.editedIndex);
+      console.log("save(), ", this.editedIndex);
 
       let obj = {
         spindleRunIn_customer: this.spindleRunIn_editedItem.customer,
@@ -944,10 +948,11 @@ export default {
       console.log("rightCloseFun()...");
 
       this.rightDialog = false
-      //this.$router.push('/navbar');
     },
 
-    filterOnlyCapsText (value, search, item) {
+    filterOnlyCapsText(value, search, item) {
+      console.log("filterOnlyCapsText(), ", value, search, item);
+
       return value != null &&
         search != null &&
         typeof value === 'string' &&

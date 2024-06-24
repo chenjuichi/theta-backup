@@ -36,7 +36,7 @@ export default {
         //axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
         //axios.defaults.headers.post['Content-Type'] = 'text/plain';
 
-        console.log("from mixin: axios baseURL: ", _protocol + "//"+ _host + ':6080');
+        //console.log("from mixin: axios baseURL: ", _protocol + "//"+ _host + ':6080');
       },
       /*
       handleKeyDown(event) {

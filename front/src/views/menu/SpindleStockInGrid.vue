@@ -10,7 +10,7 @@
       </template>
     </v-snackbar>
 
-    <v-row align="center" justify="center" v-if="currentUser.perm >= 1">
+    <v-row align="center" justify="center" v-if="currentUser.perm >= 1 && currentUser.perm <= 2">
       <v-card width="98vw" class="pa-md-4 mt-n5 mx-lg-auto mb-n3">
         <v-data-table
           :headers="headersDisplay"
@@ -253,23 +253,24 @@
     </v-row>
 
     <v-row align="center" justify="space-around" v-else>
-      <v-dialog
-        v-model="permDialog"
-        transition="dialog-bottom-transition"
-        max-width="500"
-      >
-        <v-card>
-          <v-toolbar color="primary" dark>錯誤訊息!</v-toolbar>
-          <v-card-text>
-            <div class="text-h4 pa-12">使用這項功能, 請通知管理人員...</div>
-          </v-card-text>
-          <v-card-actions class="justify-end">
-            <v-spacer></v-spacer>
-            <v-btn text @click="permCloseFun"> 取消 </v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
+        <v-dialog
+          v-model="permDialog"
+          transition="dialog-bottom-transition"
+          max-width="500"
+        >
+          <v-card>
+            <v-toolbar color="primary" dark>錯誤訊息!</v-toolbar>
+            <v-card-text>
+              <div class="text-h4 pa-12">權限不足...</div>
+            </v-card-text>
+            <v-card-actions class="justify-end">
+              <v-spacer></v-spacer>
+              <v-btn text @click="permCloseFun"> 取消 </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
     </v-row>
+
   </v-container>
 </v-app>
 </template>
@@ -403,7 +404,7 @@ export default {
     load_SingleTable_ok: false,
     load_2thTable_ok: false,
     load_3thTable_ok: false,
-
+      /*
     tags: [
       "銑削/研磨主軸(自動換刀)",
       "研磨主軸(手動換刀)",
@@ -411,7 +412,7 @@ export default {
     ],
 
     spindle_cat_array: ['TH-120.01(400V)','TH-120.02(230V)','TH-150.01(380V)','TH-150.02(220V)', 'THS-210.01(400V)', 'THS-255.01(400V)', 'THG-170.01(400V)', 'THAV-100', 'THSGD-H140', 'THSGD-H150'],
-
+      */
     clickMenuP: false,
     fromDateMenuP: false,
     fromDateValP: '',
@@ -593,6 +594,10 @@ export default {
         this.spindleStockIn_cat= '',
         this.spindleStockIn_workID= '';
 
+        this.dessertsDisplay.forEach(item => {
+          item.isSelect = false;
+        });
+
         this.load_3thTable_ok = true;
       }
     },
@@ -635,8 +640,8 @@ export default {
 
     this.currentUser = JSON.parse(localStorage.getItem("loginedUser"));
     console.log("currentUser, ", this.currentUser)
-    if (this.currentUser.perm < 1) {
-      this.permDialog=true;
+    if (!(this.currentUser.perm >= 1 &&  this.currentUser.perm <= 2)) {
+      this.permDialog = true;
     }
 
     this.pagination.itemsPerPage=this.currentUser.setting_items_per_page;
@@ -901,6 +906,12 @@ export default {
       console.log("rightCloseFun()...");
 
       this.rightDialog = false;
+    },
+
+    permCloseFun () {
+      this.permDialog = false
+      console.log("press permission Close Button...");
+      this.$router.push('/navbar');
     },
   },
 

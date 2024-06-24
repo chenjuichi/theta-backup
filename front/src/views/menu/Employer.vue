@@ -134,10 +134,7 @@
           max-width="500"
         >
           <v-card>
-            <v-toolbar
-              color="primary"
-              dark
-            >錯誤訊息!</v-toolbar>
+            <v-toolbar color="primary" dark>錯誤訊息!</v-toolbar>
             <v-card-text>
               <div class="text-h4 pa-12">權限不足...</div>
             </v-card-text>
@@ -158,7 +155,7 @@ import axios from 'axios';
 import Common from '../../mixin/common.js'
 import Key from '../../mixin/key.js'
 
-import { _thetaPassword, _thetaEmpIDLength} from '../../mixin/constant.js';
+//import { _thetaPassword, _thetaEmpIDLength} from '../../mixin/constant.js';
 import { _createCSSWithConstants } from '../../mixin/constant.js';
 
 export default {
@@ -263,23 +260,26 @@ export default {
       val || this.closeDelete()
     },
 
-    'editedItem.emp_id': function () {
+    'editedItem.emp_id': function (val) {
       let isEmpIDRule = /[0-9]{4}$/;
 
       this.IDErrMsg = '';
-      let result = this.editedItem.emp_id.search(isEmpIDRule);
-      let len=this.editedItem.emp_id.length
+      //let result = this.editedItem.emp_id.search(isEmpIDRule);
+      let result = val.search(isEmpIDRule);
+
+      //let len=this.editedItem.emp_id.length
 
       let matchResult = this.desserts.find(x => x.emp_id === this.editedItem.emp_id);
 
-      if (result != -1 || len==0) {
+      //if (result != -1 || len==0) {
+      if (result != -1) {
         if (typeof(matchResult) != 'undefined' && this.editedIndex == -1) { //2023-04-18 MODIFY
           this.IDErrMsg = '員工編號與 ' + matchResult.emp_name + ' 重複!';
         } else {
           this.IDErrMsg = '';
         }
-      } else {
-        this.IDErrMsg = '員工編號資料格式錯誤!';
+      //} else {
+      //  this.IDErrMsg = '員工編號資料格式錯誤!';
       }
     },	//end 'empID': function()
     //2023-04-18 MODIFY

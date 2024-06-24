@@ -56,13 +56,15 @@ def remove_spindle():
 
   return_value = True
   return_message = ''
-  return_message=''
 
   s = Session()
 
   #從現有主軸找資料
+  print("spindle data: ", _id, _spindle_type, _spindle_cat)
   existing_spindle = s.query(Spindle).filter_by(id=_id, spindle_type=_spindle_type, spindle_cat=_spindle_cat).first()
   _count_spindles_on_grid = len(existing_spindle._grids)
+  print("existing_spindle: ", existing_spindle)
+  print("_count_spindles_on_grid: ", _count_spindles_on_grid)
 
   if _count_spindles_on_grid == 0:
     existing_spindle.isRemoved = False
@@ -77,13 +79,14 @@ def remove_spindle():
       return_message='錯誤! API連線問題...'
       return_value = False
   else:
-      return_message='錯誤! 儲位上有此筆資料, 暫時不能刪除...'
+      return_message = '錯誤! 儲位上有此筆資料, 暫時不能刪除...'
       return_value = False
 
   s.close()
 
   return jsonify({
       'status': return_value,
+      'message': return_message,
   })
 
 
@@ -138,14 +141,19 @@ def remove_grid():
   request_data = request.get_json()
   print("request_data: ", request_data)
 
-  _temp_id = request_data['id']
+  _grid_station = request_data['grid_station']
+  _existing_station = 0 if _grid_station == '' else (1 if _grid_station == '待跑合A區' else (2 if _grid_station == '待校正B區' else (3 if _grid_station == '待測試C區' else 4)))
+  _existing_layout = int(request_data['grid_layout'])
+
+  #_temp_id = request_data['id']
   _grid_type_and_cat=request_data['grid_type_and_cat']
   _grid_max_size=request_data['grid_max_size']
   # 使用split方法将字符串分割成两部分
-  tk1="_"
-  _id, _temp_id2 = _temp_id.split(tk1)
-  _id=int(_id)
+  #tk1="_"
+  #_id, _temp_id2 = _temp_id.split(tk1)
+  #_id=int(_id)
 
+  #if (_grid_type_and_cat != ''):
   if (_grid_type_and_cat != ''):
     tk2 = " / "
     _tempT, _grid_cat = _grid_type_and_cat.split(tk2)
@@ -156,7 +164,8 @@ def remove_grid():
     _existing_grid_cat = ''
   #_existing_grid_type = 1 if _tempT == '銑削/研磨主軸(自動換刀)' else (2 if _tempT == '研磨主軸(手動換刀)' else 3)
   _existing_grid_type = 0 if _tempT == '' else (1 if _tempT == '銑削/研磨主軸(自動換刀)' else (2 if _tempT == '研磨主軸(手動換刀)' else 3))
-  print("_id, _existing_grid_type,  _existing_grid_cat: ", _id, _existing_grid_type,  _existing_grid_cat )
+  #print("_id, _existing_grid_type,  _existing_grid_cat: ", _id, _existing_grid_type,  _existing_grid_cat )
+  print("_existing_grid_type,  _existing_grid_cat: ", _existing_grid_type,  _existing_grid_cat )
 
   return_value = True
   return_message=''
@@ -164,7 +173,8 @@ def remove_grid():
   s = Session()
 
   #從現有儲位/主軸找資料
-  existing_grid = s.query(Grid).filter(Grid.id == _id).first()
+  #existing_grid = s.query(Grid).filter(Grid.id == _id).first()
+  existing_grid = s.query(Grid).filter_by(station=_existing_station, layout=_existing_layout).first()
   existing_spindle = s.query(Spindle).filter_by(spindle_type=_existing_grid_type, spindle_cat=_existing_grid_cat).first()
   if existing_spindle:
     existing_grid._spindles.remove(existing_spindle)
