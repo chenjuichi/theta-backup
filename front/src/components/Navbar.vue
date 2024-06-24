@@ -72,11 +72,18 @@
 
         </b-dropdown-item>
 
+        <b-dropdown-item href="#" @click="$router.push('/camera')">
+          <div>
+              <b-avatar variant="primary" icon="pencil-square" style="width: 1.5rem; height: 1.5rem; margin-bottom: 3pt;"></b-avatar>
+              視訊
+          </div>
+        </b-dropdown-item>
+
         <b-dropdown-item href="#">
 
             <div>
                 <b-avatar variant="primary" style="width: 1.5rem; height: 1.5rem; margin-bottom: 3pt;"></b-avatar>
-                關於 build 2024-04-30
+                關於 build 2024-05-07
             </div>
 
         </b-dropdown-item>
@@ -88,10 +95,7 @@
 
   <!--<ChangePassword :dialog_data="openDialog" @changePassword="onModifyPassword"></ChangePassword>-->
   <ChangePassword :dialog_data="openDialog"></ChangePassword>
-  <div
-    :style="inlineStyle"
-
-  ></div>
+  <div :style="inlineStyle"></div>
 </v-app>
 </template>
 
@@ -101,7 +105,6 @@ import axios from 'axios';
 import Common from '../mixin/common.js'
 
 import logo from '../assets/image/theta_logo.png'
-//import main_pic from '../assets/image/hero-bg2.jpg'
 import main_pic from '../assets/image/Company-img-02.jpg'
 
 import ChangePassword from '../components/changePassword.vue';
@@ -136,7 +139,17 @@ export default {
         top: `16vh`,
         //backgroundPosition: `center`
       }
-    }
+    },
+
+    user_id() {
+      return this.$store.getters.user_id;
+    },
+    sock_id() {
+      return this.$store.getters.sock_id;
+    },
+    local_ip() {
+      return this.$store.getters.local_ip;  // 从 Vuex 获取 local_ip
+    },
   },
 
   watch: {
@@ -190,6 +203,8 @@ export default {
   },
 
   mounted() {
+    //this.$store.dispatch('clearStorage');
+    this.checkConnection();
     //this.navBar_in_drafTags=this.$route.params.in_drafTags;
     //if (typeof(this.navBar_in_drafTags) === 'undefined') {
     //  this.navBar_in_drafTags=0;
@@ -250,6 +265,7 @@ export default {
   data() {
     return {
       openDialog: false,
+      openVideoDialog: false,
       open: false,
       navBar_in_drafTags: 0,
       navBar_out_drafTags: 0,
@@ -345,6 +361,7 @@ export default {
     changePassword() {
       this.openDialog=true;
     },
+
     /*
     async onModifyPassword(value) {
         let path='/updatePassword';
@@ -416,7 +433,21 @@ export default {
     },
 
     fetchFunction() {
-      return axios.get('/hello');
+      console.log("fetchFunction()...");
+
+      //return axios.get('/hello');
+      const path = '/hello';
+      return axios.get(path)
+      .then((res) => {
+        let temp_local_ip = res.data.local_ip;
+        console.log("temp_local_ip:", temp_local_ip)
+        this.$store.dispatch('updateLocalIP', temp_local_ip);
+        return res;
+      })
+      .catch((error) => {
+        console.error(error);
+        throw error;
+      });
     },
   },
 }

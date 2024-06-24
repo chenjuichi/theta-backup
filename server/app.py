@@ -29,7 +29,7 @@ app = Flask(__name__)  # 初始化Flask物件
 hostName = socket.gethostname()
 local_ip = socket.gethostbyname(hostName)   # get local ip address
 print('\n' + 'Lan ip: ' + '\033[46m' + local_ip + '\033[0m')
-print('Build:  ' + '\033[42m' + '2024-04-30' + '\033[0m' + '\n')
+print('Build:  ' + '\033[42m' + '2024-05-07' + '\033[0m' + '\n')
 host_ip = local_ip
 
 ctypes.windll.kernel32.SetThreadExecutionState(0x80000002)  # prevent the screen saver or sleep.
@@ -91,7 +91,9 @@ def helloWorld():
 @app.route('/hello', methods=['GET'])
 def hello():
     print("fetch hello....")
-    output = {"name": ""}
+    output = {"name": "",
+              "local_ip": local_ip,
+    }
     return jsonify(output)
 
 # --------------------------

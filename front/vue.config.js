@@ -17,6 +17,14 @@ module.exports = {
     disableHostCheck: true,   //Keep getting [WDS] Disconnected! error
   },
 
+  css: {
+    loaderOptions: {
+      sass: {
+        //additionalData: `@import "@/styles/variables.scss";`
+        prependData: `@import "@/styles/variables.scss";`
+      }
+    }
+  },
 };
 
 

@@ -692,9 +692,7 @@ export default {
           //this.readAllExcelFiles_isOK=true;
           //this.showTosterForOK(res.data.message);
           this.close();
-          //this.$router.go(0);
-          this.$router.push('/runIn');
-          //this.readAllExcelFiles_isOK=false;
+          window.location.reload(); // Reloads the current page
         } else {
           this.showTosterForError(res.data.message);
         }
